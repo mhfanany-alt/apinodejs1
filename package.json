@@ -1,0 +1,29 @@
+{
+  "name": "api_express",
+  "version": "1.0.0",
+  "description": "Project API berbasis NodeJS + API",
+  "keywords": [
+    "API",
+    "Express",
+    "NodeJS",
+    "Back",
+    "End"
+  ],
+  "license": "ISC",
+  "author": "Hilal Fanani",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "admin-lte": "^4.0.0",
+    "body-parser": "^2.2.2",
+    "bootstrap-icons": "^1.13.1",
+    "cors": "^2.8.6",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "mysql2": "^3.22.3",
+    "socket.io": "^4.8.3"
+  }
+}

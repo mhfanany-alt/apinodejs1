@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Real-Time Backup</title>
+
+    <link rel="stylesheet" href="/icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css">
+    <style>
+        @keyframes highlightMasuk {
+            0% {
+                background-color: #d1e7dd;
+                transform: scale(0.98);
+            }
+
+            100% {
+                background-color: transparent;
+                transform: scale(1);
+            }
+        }
+
+        .baris-baru {
+            animation: highlightMasuk 2s ease-out;
+        }
+    </style>
+</head>
+
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+
+    <div class="app-wrapper">
+        <nav class="app-header navbar navbar-expand bg-body shadow-sm">
+            <div class="container-fluid">
+                <span class="navbar-brand fw-bold text-primary">
+                    <i class="bi bi-cpu-fill me-2"></i>Monitor Backup Framework7
+                </span>
+            </div>
+        </nav>
+        <main class="app-main pt-4">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card card-outline card-primary shadow">
+                            <div class="card-header d-flex align-items-center justify-content-between">
+                                <h3 class="card-title fw-semibold">
+                                    <i class="bi bi-table me-2"></i>Log Backup Terbaru (Real-time)
+                                </h3>
+                                <span class="badge bg-danger animate-pulse" id="status-socket">
+                                    <i class="bi bi-broadcast me-1"></i> Menghubungkan...
+                                </span>
+                            </div>
+                            <div class="card-body p-0 table-responsive">
+                                <table class="table table-hover table-striped align-middle mb-0" id="tabel-backup">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>ID Backup</th>
+                                            <th>Nama Backup</th>
+                                            <th>Channel</th>
+                                            <th>Waktu Masuk</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="konten-tabel">
+                                        <% if(data && data.length> 0) { %>
+                                            <% for(x of data){ %>
+                                                <tr>
+                                                    <td><code class="text-secondary"><%= x.id %></code></td>
+                                                    <td class="fw-medium">
+                                                        <%= x.nama %>
+                                                    </td>
+                                                    <td>
+                                                        <span
+                                                            class="badge <%= x.channel === 'nodejs' ? 'bg-success' : 'bg-info text-dark' %>">
+                                                            <%= x.channel %>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <%= x.waktu || 'Tersimpan' %>
+                                                    </td>
+                                                </tr>
+                                                <% } %>
+                                                    <% } else { %>
+                                                        <tr id="baris-kosong">
+                                                            <td colspan="4" class="text-center text-muted py-4">
+                                                                <i class="bi bi-folder-x display-6 d-block mb-2"></i>
+                                                                Belum ada data backup di database.
+                                                            </td>
+                                                        </tr>
+                                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const statusEl = document.getElementById("status-socket");
+
+        // Koneksi SSE
+        const eventSource = new EventSource("/stream");
+
+        eventSource.onopen = () => {
+            statusEl.className = "badge bg-success";
+            statusEl.innerHTML = '<i class="bi bi-broadcast me-1"></i> Live Terhubung';
+        };
+
+        eventSource.onerror = () => {
+            statusEl.className = "badge bg-danger";
+            statusEl.innerHTML = '<i class="bi bi-wifi-off me-1"></i> Terputus';
+        };
+
+        eventSource.onmessage = (e) => {
+            const dataBaru = JSON.parse(e.data);
+
+            const barisKosong = document.getElementById("baris-kosong");
+            if (barisKosong) barisKosong.remove();
+
+            const tbody = document.getElementById("konten-tabel");
+            const barisBaru = `
+            <tr class="baris-baru">
+                <td><code class="text-secondary">${dataBaru.id}</code></td>
+                <td class="fw-bold text-dark">${dataBaru.nama}</td>
+                <td><span class="badge bg-success">${dataBaru.channel}</span></td>
+                <td>${dataBaru.waktu} <span class="badge bg-info text-dark ms-1">Baru</span></td>
+            </tr>
+        `;
+            tbody.insertAdjacentHTML("afterbegin", barisBaru);
+        };
+    </script>
+</body>
+
+</html>
