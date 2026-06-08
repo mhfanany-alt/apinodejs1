@@ -2,7 +2,11 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const db = require('./db.js');
+
+const app = require('./app');
+
 const PORT = process.env.PORT || 3000;
+
 
 const http = require("http");
 const { Server } = require("socket.io");
@@ -16,7 +20,7 @@ app.set("views", "view");
 app.use(express.static(__dirname + '/public'));
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.get("/status", (req, res) => {
     res.send(
         '{"kode":"01", "status":"API Berbasis ExpressJS OK"}'
@@ -25,7 +29,7 @@ app.get("/status", (req, res) => {
 
 app.get("/", async (req, res) => {
     const dtx = await db.getMetode();
-    res.render("beranda", {data: dtx || []});
+    res.render("beranda", { data: dtx || [] });
 })
 app.post("/backup", async (req, res) => {
     let pesanx, kodex;
@@ -34,10 +38,10 @@ app.post("/backup", async (req, res) => {
     let id = Date.now();
     let arr_data = dtx.split("#");
     let proses = await db.tambahBackup(id, nama, "nodejs");
-    if(proses == "1"){
+    if (proses == "1") {
         let berhasil = 0;
         let gagal = 0;
-        for(let k of arr_data){
+        for (let k of arr_data) {
             if (k == "") continue;
             let arr_data2 = k.split("|");
             let idx = arr_data2[0];
@@ -56,10 +60,10 @@ app.post("/backup", async (req, res) => {
             channel: "nodejs",
             waktu: tanggalAman
         });
-        pesanx = {kode: "01", status: "Proses Backup Berhasil Dengan Rincian", berhasil: berhasil, gagal: gagal};
+        pesanx = { kode: "01", status: "Proses Backup Berhasil Dengan Rincian", berhasil: berhasil, gagal: gagal };
         kodex = 200;
-    }else{
-        pesanx = {kode: "00", status: "Proses Backup Gagal, Periksa Kembali Data Anda"};
+    } else {
+        pesanx = { kode: "00", status: "Proses Backup Gagal, Periksa Kembali Data Anda" };
         kodex = 500;
     }
     return res.status(kodex).json(pesanx);
@@ -91,4 +95,8 @@ const kirimKeSemuaClient = (data) => {
     clients.forEach(client => {
         client.write(`data: ${JSON.stringify(data)}\n\n`);
     });
+
 };
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
