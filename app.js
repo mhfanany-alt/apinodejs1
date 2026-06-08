@@ -6,7 +6,9 @@ const db = require('./db.js');
 const app = require('./app');
 
 const PORT = process.env.PORT || 3000;
-
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
 
 const http = require("http");
 const { Server } = require("socket.io");
@@ -97,6 +99,3 @@ const kirimKeSemuaClient = (data) => {
     });
 
 };
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
