@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const db = require('./db.js');
-const port = 5775;
+const PORT = process.env.PORT || 3000;
 
 const http = require("http");
 const { Server } = require("socket.io");
