@@ -108,6 +108,10 @@ app.get("/stream", (req, res) => {
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
+    res.flushHeaders();
+
+    res.write(`data: ${JSON.stringify({ status: "connected" })}\n\n`);
+    
     clients.push(res);
 
     req.on("close", () => {

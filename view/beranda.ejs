@@ -116,18 +116,27 @@
         eventSource.onmessage = (e) => {
             const dataBaru = JSON.parse(e.data);
 
+            if (dataBaru.status === "connected") {
+                statusEl.className = "badge bg-success";
+                statusEl.innerHTML =
+                    '<i class="bi bi-broadcast me-1"></i> Live Terhubung';
+                return;
+            }
+
             const barisKosong = document.getElementById("baris-kosong");
             if (barisKosong) barisKosong.remove();
 
             const tbody = document.getElementById("konten-tabel");
+
             const barisBaru = `
-            <tr class="baris-baru">
-                <td><code class="text-secondary">${dataBaru.id}</code></td>
-                <td class="fw-bold text-dark">${dataBaru.nama}</td>
-                <td><span class="badge bg-success">${dataBaru.channel}</span></td>
-                <td>${dataBaru.waktu} <span class="badge bg-info text-dark ms-1">Baru</span></td>
-            </tr>
-        `;
+                <tr class="baris-baru">
+                    <td><code class="text-secondary">${dataBaru.id}</code></td>
+                    <td class="fw-bold text-dark">${dataBaru.nama}</td>
+                    <td><span class="badge bg-success">${dataBaru.channel}</span></td>
+                    <td>${dataBaru.waktu} <span class="badge bg-info text-dark ms-1">Baru</span></td>
+                </tr>
+            `;
+
             tbody.insertAdjacentHTML("afterbegin", barisBaru);
         };
     </script>
