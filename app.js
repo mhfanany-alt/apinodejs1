@@ -3,6 +3,7 @@ const app = express();
 const cors = require("cors");
 const db = require("./db.js");
 const port = process.env.PORT || 3000;
+const clients = [];
 
 app.set("view engine", "ejs");
 app.set("views", "view");
@@ -57,6 +58,18 @@ app.post("/backup", async (req, res) => {
                 berhasil: berhasil,
                 gagal: gagal
             };
+
+            const dataBaru = {
+                id: id,
+                nama: nama,
+                channel: "nodeJS",
+                waktu: new Date().toLocaleString('id-ID')
+            };
+
+            clients.forEach(client => {
+                client.write(`data: ${JSON.stringify(dataBaru)}\n\n`);
+            });
+
             kodex = 200;
 
         } else {
@@ -81,9 +94,28 @@ app.post("/backup", async (req, res) => {
 app.get("/daftar_backup", async (req, res) => {
     const dtx = await db.getMetode();
     if(dtx == false){
-        res.send('{"kode": "00", "pesan":"Data Backup Tidak Ditemukan"}');
+        return res.send({
+            kode: "00",
+            status: "Data Backup Tidak Ditemukan"
+        });
     }
     return res.json(dtx);
+});
+
+//route SSE
+app.get("/stream", (req, res) => {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    clients.push(res);
+
+    req.on("close", () => {
+        const index = clients.indexOf(res);
+        if (index !== -1) {
+            clients.splice(index, 1);
+        }
+    });
 });
 
 // TAMBAHAN UNTUK MENAMPILKAN DATA DI BERANDA
