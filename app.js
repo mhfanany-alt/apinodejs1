@@ -79,10 +79,11 @@ app.post("/backup", async (req, res) => {
 });
 
 app.get("/daftar_backup", async (req, res) => {
-    const dtx = await db.bacaBackup();
-    if(dtbackup == false){
+    const dtx = await db.getMetode();
+    if(dtx == false){
         res.send('{"kode": "00", "pesan":"Data Backup Tidak Ditemukan"}');
     }
+    return res.json(dtx);
 });
 
 // TAMBAHAN UNTUK MENAMPILKAN DATA DI BERANDA
@@ -101,13 +102,3 @@ app.get("/status", (req, res) => {
 app.listen(port, () => {
     console.log(`API berjalan di port: ${port}`);
 });
-
-app.get("/status", (req, res) => {
-    res.send(
-        '{"kode":"01", "status":"API Berbasis ExpressJS OK"}'
-    );
-})
-
-app.listen(port, () => {
-    console.log(`API berjalan di port: ${port}`);
-})
