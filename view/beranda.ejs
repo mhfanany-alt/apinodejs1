@@ -98,11 +98,12 @@
     </div>
     <script src="/dist/js/adminlte.min.js"></script>
     <script>
-       const statusE1 = document.getElementById("status-socket");
+       const statusEl = document.getElementById("status-socket");
        async function loadBackupData() {
             try {
                 const response = await fetch("/backup/latest");
                 const data = await response.json();
+                console.log("Data diterima:", data);
 
                 statusEl.className = "badge bg-success";
                 statusEl.innerHTML = 
@@ -148,10 +149,10 @@
             }
         }
         // pertama kali load
-        loadBackup();
+        loadBackupData();
 
         // refresh tiap 3 detik
-        setInterval(loadBackup, 3000);
+        setInterval(loadBackupData, 3000);
     </script>
 </body>
 
