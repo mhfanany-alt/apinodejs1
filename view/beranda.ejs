@@ -98,47 +98,60 @@
     </div>
     <script src="/dist/js/adminlte.min.js"></script>
     <script>
-        const statusEl = document.getElementById("status-socket");
+       const statusE1 = document.getElementById("status-socket");
+       async function loadBackupData() {
+            try {
+                const response = await fetch("/backup/latest");
+                const data = await response.json();
 
-        // Koneksi SSE
-        const eventSource = new EventSource("/stream");
-
-        eventSource.onopen = () => {
-            statusEl.className = "badge bg-success";
-            statusEl.innerHTML = '<i class="bi bi-broadcast me-1"></i> Live Terhubung';
-        };
-
-        eventSource.onerror = () => {
-            statusEl.className = "badge bg-danger";
-            statusEl.innerHTML = '<i class="bi bi-wifi-off me-1"></i> Terputus';
-        };
-
-        eventSource.onmessage = (e) => {
-            const dataBaru = JSON.parse(e.data);
-
-            if (dataBaru.status === "connected") {
                 statusEl.className = "badge bg-success";
-                statusEl.innerHTML =
-                    '<i class="bi bi-broadcast me-1"></i> Live Terhubung';
-                return;
+                statusEl.innerHTML = 
+                    '<i class="bi bi-arrow-repeat me-1"></i> Polling Aktif';
+                
+                    const tbody = document.getElementById("konten-tabel");
+
+                    tbody.innerHTML = "";
+
+                    if (!data || data.length === 0) {
+                        tbody.innerHTML = `
+                            <tr id="baris-kosong">
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    <i class="bi bi-folder-x display-6 d-block mb-2"></i>
+                                    Belum ada data backup di database.
+                                </td>
+                            </tr>
+                        `;
+                        return;
+                    }
+
+                    data.reverse().forEach(item => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>
+                                    <code class="text-secondary">${item.id}</code>
+                                </td>
+                                <td class="fw-medium">${item.nama}</td>
+                                <td>
+                                    <span class="badge bg-success">
+                                        ${item.channel}
+                                    </span>
+                                </td>
+                                <td>${item.waktu}</td>
+                            </tr>
+                        `;
+                    });
+            } catch (err) {
+                statusEl.className = "badge bg-danger";
+                statusEl.innerHTML = 
+                    '<i class="bi bi-wifi-off me-1"></i> Polling Gagal';
+                console.error(err);
             }
+        }
+        // pertama kali load
+        loadBackup();
 
-            const barisKosong = document.getElementById("baris-kosong");
-            if (barisKosong) barisKosong.remove();
-
-            const tbody = document.getElementById("konten-tabel");
-
-            const barisBaru = `
-                <tr class="baris-baru">
-                    <td><code class="text-secondary">${dataBaru.id}</code></td>
-                    <td class="fw-bold text-dark">${dataBaru.nama}</td>
-                    <td><span class="badge bg-success">${dataBaru.channel}</span></td>
-                    <td>${dataBaru.waktu} <span class="badge bg-info text-dark ms-1">Baru</span></td>
-                </tr>
-            `;
-
-            tbody.insertAdjacentHTML("afterbegin", barisBaru);
-        };
+        // refresh tiap 3 detik
+        setInterval(loadBackup, 3000);
     </script>
 </body>
 

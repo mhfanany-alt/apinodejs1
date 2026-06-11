@@ -3,7 +3,6 @@ const app = express();
 const cors = require("cors");
 const db = require("./db.js");
 const port = process.env.PORT || 3000;
-const clients = [];
 
 app.set("view engine", "ejs");
 app.set("views", "view");
@@ -59,17 +58,6 @@ app.post("/backup", async (req, res) => {
                 gagal: gagal
             };
 
-            const dataBaru = {
-                id: id,
-                nama: nama,
-                channel: "nodeJS",
-                waktu: new Date().toLocaleString('id-ID')
-            };
-
-            clients.forEach(client => {
-                client.write(`data: ${JSON.stringify(dataBaru)}\n\n`);
-            });
-
             kodex = 200;
 
         } else {
@@ -103,24 +91,6 @@ app.get("/daftar_backup", async (req, res) => {
 });
 
 //route SSE
-app.get("/stream", (req, res) => {
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
-
-    res.flushHeaders();
-
-    res.write(`data: ${JSON.stringify({ status: "connected" })}\n\n`);
-    
-    clients.push(res);
-
-    req.on("close", () => {
-        const index = clients.indexOf(res);
-        if (index !== -1) {
-            clients.splice(index, 1);
-        }
-    });
-});
 
 // TAMBAHAN UNTUK MENAMPILKAN DATA DI BERANDA
 app.get("/", async (req, res) => {
@@ -133,6 +103,20 @@ app.get("/status", (req, res) => {
         kode: "01",
         status: "API Berbasis ExpressJS OK"
     });
+});
+
+app.get("/backup/latest", async (req, res) => {
+    try {
+        const data = await db.getMetode();
+        if (!data) {
+            return res.json([]);
+        }
+        // ambil 20 data terbaru
+        const laters = data.slice(-20);
+        res.json(laters);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.listen(port, () => {
