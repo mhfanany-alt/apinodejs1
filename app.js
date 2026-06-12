@@ -119,6 +119,17 @@ app.get("/backup/latest", async (req, res) => {
     }
 });
 
+app.get("/backup/detail/:id", async(req,res) => {
+    try{
+        const data = await db.getDetailBackup(req.params.id);
+        res.json(data);
+    }catch(err) {
+        res.status(500).json({
+            error:err.message
+        });
+    }
+});
+
 app.listen(port, () => {
     console.log(`API berjalan di port: ${port}`);
 });

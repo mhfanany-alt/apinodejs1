@@ -9,12 +9,60 @@ const buatKoneksi = async () => {
         database: 'u3cfe03y_transaksi'
     })
 }
+// website
 const getMetode = async () => {
     const db = await buatKoneksi();
-    sql = "SELECT * FROM backup";
+    sql = `
+    SELECT
+        b.id,
+        b.nama,
+        b.channel,
+        b.waktu,
+
+        COUNT(bt.id) AS jumlah_transaksi,
+        
+        IFNULL(
+            SUM(
+                CASE
+                    WHEN bt.jenis='+' THEN bt.nominal
+                    ELSE 0
+                END
+            ),0
+        ) AS total_masuk,
+
+        
+        IFNULL(
+            SUM(
+                CASE
+                    WHEN bt.jenis='-' THEN bt.nominal
+                    ELSE 0
+                END
+            ),0
+        ) AS total_keluar
+    FROM backup b
+
+    LEFT JOIN backup_transaksi bt
+        ON b.id = bt.id_backup
+
+    GROUP BY
+        b.id,
+        b.nama,
+        b.channel,
+        b.waktu
+
+    ORDER BY b.waktu DESC
+    `;
     const [rows] = await db.execute(sql);
     return rows.length > 0 ? rows : false;
 }
+// detail backup
+const getDetailBackup = async(id_backup) => {
+    const db = await buatKoneksi();
+    sql = `SELECT * FROM backup_transaksi WHERE id_backup=? ORDER BY tgl_jam ASC`;
+    const [rows] = await db.execute(sql,[id_backup]);
+    return rows;
+}
+
 const tambahBackup = async (id, nama, channel) => {
     const db = await buatKoneksi();
     sql = `INSERT INTO backup VALUES('${id}', '${nama}', '${channel}',NOW())`;
@@ -41,4 +89,4 @@ const getTransaksi = async () => {
     const [rows] = await db.execute(sql);
     return rows.length > 0 ? rows : false;
 }
-module.exports = {buatKoneksi, getMetode, tambahBackup, tambahTransaksi, getTransaksi};
+module.exports = {buatKoneksi, getMetode, getDetailBackup, tambahBackup, tambahTransaksi, getTransaksi};

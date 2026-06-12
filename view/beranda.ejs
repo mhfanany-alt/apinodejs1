@@ -37,116 +37,318 @@
                 </span>
             </div>
         </nav>
-        <main class="app-main pt-4">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card card-outline card-primary shadow">
-                            <div class="card-header d-flex align-items-center justify-content-between">
-                                <h3 class="card-title fw-semibold">
-                                    <i class="bi bi-table me-2"></i>Log Backup Terbaru (Real-time)
-                                </h3>
-                                <span class="badge bg-danger animate-pulse" id="status-socket">
-                                    <i class="bi bi-broadcast me-1"></i> Menghubungkan...
-                                </span>
+        <main class="app-main">
+
+            <!-- Header -->
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0 fw-bold">
+                                Dashboard Backup
+                            </h3>
+                            <small class="text-muted">
+                                Monitoring Backup Framework7 Realtime
+                            </small>
+                        </div>
+                        <div class="col-sm-6 text-end">
+                            <span class="badge bg-success fs-6"
+                                id="status-socket">
+                                <i class="bi bi-arrow-repeat"></i>
+                                Polling Aktif
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="app-content">
+                <div class="container-fluid">
+
+                    <!-- Statistik -->
+                    <div class="row">
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box text-bg-primary">
+                                <div class="inner">
+                                    <h3 id="total-backup">0</h3>
+                                    <p>Total Backup</p>
+                                </div>
+                                <div class="small-box-icon">
+                                    <i class="bi bi-database"></i>
+                                </div>
                             </div>
-                            <div class="card-body p-0 table-responsive">
-                                <table class="table table-hover table-striped align-middle mb-0" id="tabel-backup">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>ID Backup</th>
-                                            <th>Nama Backup</th>
-                                            <th>Channel</th>
-                                            <th>Waktu Masuk</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="konten-tabel">
-                                        <% if(data && data.length> 0) { %>
-                                            <% for(x of data){ %>
-                                                <tr>
-                                                    <td><code class="text-secondary"><%= x.id %></code></td>
-                                                    <td class="fw-medium">
-                                                        <%= x.nama %>
-                                                    </td>
-                                                    <td>
-                                                        <span
-                                                            class="badge <%= x.channel === 'nodejs' ? 'bg-success' : 'bg-info text-dark' %>">
-                                                            <%= x.channel %>
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <%= x.waktu || 'Tersimpan' %>
-                                                    </td>
-                                                </tr>
-                                                <% } %>
-                                                    <% } else { %>
-                                                        <tr id="baris-kosong">
-                                                            <td colspan="4" class="text-center text-muted py-4">
-                                                                <i class="bi bi-folder-x display-6 d-block mb-2"></i>
-                                                                Belum ada data backup di database.
-                                                            </td>
-                                                        </tr>
-                                                        <% } %>
-                                    </tbody>
-                                </table>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box text-bg-success">
+                                <div class="inner">
+                                    <h3 id="total-masuk">
+                                        Rp0
+                                    </h3>
+                                    <p>Total Pemasukan</p>
+                                </div>
+                                <div class="small-box-icon">
+                                    <i class="bi bi-graph-up-arrow"></i>
+                                </div>
                             </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box text-bg-danger">
+                                <div class="inner">
+                                    <h3 id="total-keluar">
+                                        Rp0
+                                    </h3>
+                                    <p>Total Pengeluaran</p>
+                                </div>
+                                <div class="small-box-icon">
+                                    <i class="bi bi-graph-down-arrow"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box text-bg-info">
+                                <div class="inner">
+                                    <h3 id="total-transaksi">
+                                        0
+                                    </h3>
+                                    <p>Total Transaksi</p>
+                                </div>
+                                <div class="small-box-icon">
+                                    <i class="bi bi-receipt"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TABEL -->
+                    <div class="card card-outline card-primary shadow-sm">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="bi bi-clock-history me-2"></i>
+                                Riwayat Backup
+                            </h3>
+                        </div>
+                        <div class="card-body table-responsive p-0">
+                            <table
+                                class="table table-hover table-striped align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Backup</th>
+                                        <th>Channel</th>
+                                        <th>Waktu</th>
+                                        <th>Transaksi</th>
+                                        <th>Masuk</th>
+                                        <th>Keluar</th>
+                                        <th width="120">
+                                            Aksi
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="konten-tabel">
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
+    <!-- modal detail backup -->
+     <div class="modal fade" id="modalDetail" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-receipt"></i>Detail Backup
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- statistik -->
+                    <div class="row md-4">
+                        <div class="col-md-4">
+                            <div class="small-box text-bg-info">
+                                <div class="inner">
+                                    <h3 id="detail-jumlah">0</h3>
+                                    <p>Total Transaksi</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="small-box text-bg-success">
+                                <div class="inner">
+                                    <h3 id="detail-masuk">Rp.0</h3>
+                                    <p>Total Masuk</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="small-box text-bg-danger">
+                                <div class="inner">
+                                    <h3 id="detail-keluar">0</h3>
+                                    <p>Total Keluar</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- tabel detail -->
+                     <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <td>No</td>
+                                <td>Uraian</td>
+                                <td>Waktu</td>
+                                <td>Jenis</td>
+                                <td>Nominal</td>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-body">
+
+                        </tbody>
+                     </table>
+                </div>
+            </div>
+        </div>
+     </div>
+     <script src="/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/dist/js/adminlte.min.js"></script>
     <script>
-       const statusEl = document.getElementById("status-socket");
-       async function loadBackupData() {
+        const statusEl = document.getElementById("status-socket");
+        async function loadBackupData() {
             try {
                 const response = await fetch("/backup/latest");
                 const data = await response.json();
-                console.log("Data diterima:", data);
+                console.log(data);
 
-                statusEl.className = "badge bg-success";
-                statusEl.innerHTML = 
+                // Status polling
+                statusEl.className = "badge bg-success fs-6";
+                statusEl.innerHTML =
                     '<i class="bi bi-arrow-repeat me-1"></i> Polling Aktif';
-                
-                    const tbody = document.getElementById("konten-tabel");
 
-                    tbody.innerHTML = "";
+                // TOTAL BACKUP
+                document.getElementById("total-backup").innerHTML = data.length;
 
-                    if (!data || data.length === 0) {
-                        tbody.innerHTML = `
-                            <tr id="baris-kosong">
-                                <td colspan="4" class="text-center text-muted py-4">
-                                    <i class="bi bi-folder-x display-6 d-block mb-2"></i>
-                                    Belum ada data backup di database.
-                                </td>
-                            </tr>
-                        `;
-                        return;
-                    }
+                // ambil data web dri db
+                let totalMasuk = 0;
+                let totalKeluar = 0;
+                let totalTransaksi = 0;
 
-                    data.reverse().forEach(item => {
-                        tbody.innerHTML += `
-                            <tr>
-                                <td>
-                                    <code class="text-secondary">${item.id}</code>
-                                </td>
-                                <td class="fw-medium">${item.nama}</td>
-                                <td>
-                                    <span class="badge bg-success">
-                                        ${item.channel}
-                                    </span>
-                                </td>
-                                <td>${item.waktu}</td>
-                            </tr>
-                        `;
-                    });
-            } catch (err) {
-                statusEl.className = "badge bg-danger";
-                statusEl.innerHTML = 
-                    '<i class="bi bi-wifi-off me-1"></i> Polling Gagal';
-                console.error(err);
+                data.forEach(item => {
+                    totalMasuk += Number(item.total_masuk);
+                    totalKeluar += Number(item.total_keluar);
+                    totalTransaksi += Number(item.jumlah_transaksi);
+                });
+                document.getElementById("total-masuk").innerHTML =
+                    "Rp " + totalMasuk.toLocaleString("id-ID");
+                document.getElementById("total-keluar").innerHTML =
+                    "Rp " + totalKeluar.toLocaleString("id-ID");
+                document.getElementById("total-transaksi").innerHTML =
+                    totalTransaksi;
+
+
+                const tbody = document.getElementById("konten-tabel");
+                tbody.innerHTML = "";
+                if(data.length==0){
+                    tbody.innerHTML=`
+                        <tr>
+                            <td colspan="8" class="text-center">
+                                Belum ada data Backup
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                let no = 1;
+                data.reverse().forEach(item=>{
+                    let warna =
+                    item.channel.toLowerCase()=="nodejs"
+                    ?
+                    "bg-success"
+                    :
+                    "bg-info";
+                    tbody.innerHTML +=`
+                    <tr>
+                        <td>${no++}</td>
+                        <td>
+                            <strong>${item.nama}</strong>
+                        </td>
+                        <td>
+                            <span class="badge ${warna}">
+                                ${item.channel}
+                            </span>
+                        </td>
+                        <td>
+                            ${new Date(item.waktu).toLocaleString("id-ID")}
+                        </td>
+                        <td>
+                            <span class="badge bg-warning">
+                                ${item.jumlah_transaksi}
+                            </span>
+                        </td>
+                        <td class="text-success fw-bold">
+                            Rp ${Number(item.total_masuk).toLocaleString("id-ID")}
+                        </td>
+                        <td class="text-danger fw-bold">
+                            Rp ${Number(item.total_keluar).toLocaleString("id-ID")}
+                        </td>
+                        <td>
+                            <button
+                                class="btn btn-outline-primary btn-sm"
+                                onclick="lihatDetail('${item.id}')">
+                                <i class="bi bi-eye"></i> Detail
+                            </button>
+                        </td>
+                    </tr>
+                    `;
+                });
             }
+            catch(err){
+               console.log(err);
+            }
+        }
+        async function lihatDetail(id) {
+            const response = await fetch(`/backup/detail/${id}`);
+            const data = await response.json();
+            console.log(data);
+
+            const tbody = document.getElementById("detail-body");
+            tbody.innerHTML = "";
+
+            let no = 1;
+            let masuk = 0;
+            let keluar = 0;
+
+            data.forEach(item => {
+                if(item.jenis=="+"){
+                    masuk += Number(item.nominal);
+                }else{
+                    keluar += Number(item.nominal);
+                }
+
+                let badge = item.jenis=="+" ? "bg-success" : "bg-danger";
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${no++}</td>
+                        <td>${item.uraian}</td>
+                        <td>${new Date(item.tgl_jam).toLocaleDateString("id-ID")}</td>
+                        <td>
+                            <span class="badge ${badge}">${item.jenis}</span>
+                        </td>
+                        <td class="${item.jenis=="+" ? "text-success" : "text-danger"} fw-bold">
+                            Rp${Number(item.nominal).toLocaleString("id-ID")}                            
+                        </td>
+                    </tr>
+                `;
+            });
+            document.getElementById("detail-jumlah").innerHTML = data.length;
+            document.getElementById("detail-masuk").innerHTML = "Rp" + masuk.toLocaleString("id-ID");
+            document.getElementById("detail-keluar").innerHTML = "Rp" + keluar.toLocaleString("id-ID");
+            
+            const modal = new bootstrap.Modal(
+                document.getElementById("modalDetail")
+            );
+            modal.show();
         }
         // pertama kali load
         loadBackupData();
